@@ -7,6 +7,7 @@
 #include "processPointClouds.h"
 // using templates for processPointClouds so also include .cpp to help linker
 #include "processPointClouds.cpp"
+#include "ransac.h"
 
 std::vector<Car> initHighway(bool renderScene, pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
@@ -46,9 +47,18 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     std::vector<Car> cars = initHighway(renderScene, viewer);
     
     // TODO:: Create lidar sensor 
-
+    Lidar* lidar = new Lidar(cars,0);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr pointCloud = lidar->scan();
+    //renderRays(viewer, lidar->position ,pointCloud);
+    //renderPointCloud(viewer,pointCloud,"pc");
     // TODO:: Create point processor
-  
+
+    ProcessPointClouds<pcl::PointXYZ> ppc;
+    //std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = ppc.SegmentPlane(pointCloud, 100, 0.2);
+    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = Ransac<pcl::PointXYZ>(pointCloud, 100, 0.2);
+    
+    //renderPointCloud(viewer,segmentCloud.first,"planeCloud",Color(0,1,0));
+    renderPointCloud(viewer,segmentCloud.second,"obstCloud",Color(1,0,0));
 }
 
 
