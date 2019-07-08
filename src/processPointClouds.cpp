@@ -28,12 +28,31 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
     auto startTime = std::chrono::steady_clock::now();
 
     // TODO:: Fill in the function to do voxel grid point reduction and region based filtering
+    typename pcl::PointCloud<PointT>::Ptr voxelResult (new pcl::PointCloud<PointT>());
+    typename pcl::PointCloud<PointT>::Ptr cropResult  (new pcl::PointCloud<PointT>());
+
+    pcl::VoxelGrid<PointT> sor;
+    sor.setInputCloud (cloud);
+    sor.setLeafSize (filterRes, filterRes, filterRes);
+    sor.filter (*voxelResult);
+
+    pcl::CropBox<PointT> crop;
+    crop.setMin(minPoint);
+    crop.setMax(maxPoint);
+    crop.setInputCloud(voxelResult);
+    crop.filter(*cropResult);
+
+    crop.setMin(Eigen::Vector4f (-2, -2, -2, 1));
+    crop.setMax(Eigen::Vector4f (2,2,2,1));
+    crop.setInputCloud(cropResult);
+    crop.setNegative (true);
+    crop.filter(*cropResult);
 
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
-    return cloud;
+    return cropResult;
 
 }
 
@@ -45,7 +64,7 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     typename pcl::PointCloud<PointT>::Ptr inliers   (new typename pcl::PointCloud<PointT>());
     typename pcl::PointCloud<PointT>::Ptr background (new typename pcl::PointCloud<PointT>());
     
-    pcl::ExtractIndices<pcl::PointXYZ> extract;
+    pcl::ExtractIndices<PointT> extract;
     extract.setInputCloud (cloud);
     extract.setIndices (inliersIndex);
     extract.setNegative (false);
@@ -68,7 +87,7 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     pcl::PointIndices::Ptr                inliersIndex (new pcl::PointIndices ());
     pcl::ModelCoefficients::Ptr           coefficients (new pcl::ModelCoefficients ());
 
-    pcl::SACSegmentation<pcl::PointXYZ> seg;
+    pcl::SACSegmentation<PointT> seg;
     seg.setOptimizeCoefficients (true);
     seg.setModelType (pcl::SACMODEL_PLANE);
     seg.setMethodType (pcl::SAC_RANSAC);

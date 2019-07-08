@@ -73,7 +73,10 @@ std::pair<PointT,PointT> estimateModel(typename pcl::PointCloud<PointT>::Ptr clo
         size_t p2 = rand() % cloud->size();
         size_t p3 = rand() % cloud->size();
 
-        if(p1 == p2 || p2 == p3 || p3 == p1) continue;
+        if(p1 == p2 || p2 == p3 || p3 == p1) {
+            maxIterations--;
+            continue;
+        }
 
         PointT origin = cloud->at(p1);
         PointT normal = crossProduct<PointT>( sub<PointT>(cloud->at(p2),cloud->at(p1)), sub<PointT>(cloud->at(p3),cloud->at(p1)));
@@ -91,11 +94,8 @@ std::pair<PointT,PointT> estimateModel(typename pcl::PointCloud<PointT>::Ptr clo
             modelOrigin = origin;
             modelNormal = normal;
         }
-        std::cout << inlierCount << std::endl;
 
     }
-    std::cout << "Max Inliers " << maxInliers << " total points: " << cloud->size() << std::endl;
-
 
     std::pair<PointT,PointT> model(modelNormal,modelOrigin);
     return model;

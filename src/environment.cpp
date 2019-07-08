@@ -85,6 +85,18 @@ void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& vi
         viewer->addCoordinateSystem (1.0);
 }
 
+void streamCityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer, ProcessPointClouds<pcl::PointXYZI>* pointProcessorI, const pcl::PointCloud<pcl::PointXYZI>::Ptr& inputCloud){
+    typename pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud = pointProcessorI->FilterCloud(inputCloud, .250 , Eigen::Vector4f (-6, -6.2, -15, 1), Eigen::Vector4f ( 26, 6.7, 15, 1));
+    //std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloudPCL = pointProcessorI->SegmentPlane(filterCloud, 1000, 0.55);
+    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud    = Ransac<pcl::PointXYZI>(filterCloud, 1000, 0.26);
+    //renderPointCloud(viewer,segmentCloudPCL.second,"obstCloudPCL",Color(1,0,0));
+    renderPointCloud(viewer,segmentCloud.second,"obstCloud",Color(1,0,0));
+    renderPointCloud(viewer,segmentCloud.first,"groundCloud",Color(0,1,0));
+    
+
+    //renderPointCloud(viewer,filterCloud,"filterCloud");
+}
+
 
 int main (int argc, char** argv)
 {
@@ -93,10 +105,26 @@ int main (int argc, char** argv)
     pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
     CameraAngle setAngle = XY;
     initCamera(setAngle, viewer);
-    simpleHighway(viewer);
+    //simpleHighway(viewer);
+    //cityBlock(viewer);
 
-    while (!viewer->wasStopped ())
-    {
+    ProcessPointClouds<pcl::PointXYZI>*  pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
+    std::vector<boost::filesystem::path> stream          = pointProcessorI->streamPcd("../src/sensors/data/pcd/data_1");
+    auto streamIterator = stream.begin();
+    pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloudI;
+
+
+    while (!viewer->wasStopped ()){
+        viewer->removeAllPointClouds();
+        viewer->removeAllShapes();
+        
+        inputCloudI = pointProcessorI->loadPcd((*streamIterator).string());
+        streamCityBlock(viewer, pointProcessorI, inputCloudI);
+        
+        streamIterator++;
+        if(streamIterator == stream.end()){
+            streamIterator = stream.begin();
+        }
         viewer->spinOnce ();
     } 
 }
