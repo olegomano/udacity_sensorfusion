@@ -1,13 +1,14 @@
 /* \author Aaron Brown */
 // Create simple 3d highway enviroment using PCL
 // for exploring self-driving car sensors
-
+#include <exception>
 #include "sensors/lidar.h"
 #include "render/render.h"
 #include "processPointClouds.h"
 // using templates for processPointClouds so also include .cpp to help linker
 #include "processPointClouds.cpp"
 #include "ransac.h"
+#include "cluster.h"
 
 std::vector<Car> initHighway(bool renderScene, pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
@@ -86,13 +87,18 @@ void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& vi
 }
 
 void streamCityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer, ProcessPointClouds<pcl::PointXYZI>* pointProcessorI, const pcl::PointCloud<pcl::PointXYZI>::Ptr& inputCloud){
-    typename pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud = pointProcessorI->FilterCloud(inputCloud, .250 , Eigen::Vector4f (-6, -6.2, -15, 1), Eigen::Vector4f ( 26, 6.7, 15, 1));
+    typename pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud = pointProcessorI->FilterCloud(inputCloud, .14 , Eigen::Vector4f (-6, -6.2, -15, 1), Eigen::Vector4f ( 26, 6.7, 15, 1));
+ //   KDTree<pcl::PointXYZI> kd(inputCloud);
     //std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloudPCL = pointProcessorI->SegmentPlane(filterCloud, 1000, 0.55);
-    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud    = Ransac<pcl::PointXYZI>(filterCloud, 1000, 0.26);
+    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud    = Ransac<pcl::PointXYZI>(filterCloud, 5000, 0.16);
     //renderPointCloud(viewer,segmentCloudPCL.second,"obstCloudPCL",Color(1,0,0));
     renderPointCloud(viewer,segmentCloud.second,"obstCloud",Color(1,0,0));
     renderPointCloud(viewer,segmentCloud.first,"groundCloud",Color(0,1,0));
     
+    std::vector<Box> bounds = cluster<pcl::PointXYZI>(segmentCloud.second,0.195);
+    for(int i = 0; i < bounds.size(); i++){
+        renderBox(viewer,bounds[i],i,Color(1,0,0),0.5f);
+    }
 
     //renderPointCloud(viewer,filterCloud,"filterCloud");
 }
@@ -108,8 +114,9 @@ int main (int argc, char** argv)
     //simpleHighway(viewer);
     //cityBlock(viewer);
 
+
     ProcessPointClouds<pcl::PointXYZI>*  pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
-    std::vector<boost::filesystem::path> stream          = pointProcessorI->streamPcd("../src/sensors/data/pcd/data_1");
+    std::vector<boost::filesystem::path> stream          = pointProcessorI->streamPcd("/home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/sensors/data/pcd/data_1");
     auto streamIterator = stream.begin();
     pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloudI;
 

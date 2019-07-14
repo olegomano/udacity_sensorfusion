@@ -74,7 +74,7 @@ std::pair<PointT,PointT> estimateModel(typename pcl::PointCloud<PointT>::Ptr clo
         size_t p3 = rand() % cloud->size();
 
         if(p1 == p2 || p2 == p3 || p3 == p1) {
-            maxIterations--;
+            i--;
             continue;
         }
 

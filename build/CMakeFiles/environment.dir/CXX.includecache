@@ -6,7 +6,19 @@
 
 #IncludeRegexTransform: 
 
+/home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/cluster.h
+render/box.h
+/home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/render/box.h
+vector
+-
+limits
+-
+unordered_set
+-
+
 /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/environment.cpp
+exception
+-
 sensors/lidar.h
 /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/sensors/lidar.h
 render/render.h
@@ -17,6 +29,8 @@ processPointClouds.cpp
 /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/processPointClouds.cpp
 ransac.h
 /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/ransac.h
+cluster.h
+/home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/cluster.h
 
 /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/processPointClouds.cpp
 processPointClouds.h
