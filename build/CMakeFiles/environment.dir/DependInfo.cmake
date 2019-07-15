@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/processPointClouds.cpp" "/home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/build/CMakeFiles/environment.dir/src/processPointClouds.cpp.o"
   "/home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/render/render.cpp" "/home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/build/CMakeFiles/environment.dir/src/render/render.cpp.o"
   )
-set(CMAKE_CXX_COMPILER_ID "GNU")
+set(CMAKE_CXX_COMPILER_ID "Clang")
 
 # Preprocessor definitions for this target.
 set(CMAKE_TARGET_DEFINITIONS_CXX

@@ -3,6 +3,7 @@
 
 CMakeFiles/environment.dir/src/environment.cpp.o: ../src/cluster.h
 CMakeFiles/environment.dir/src/environment.cpp.o: ../src/environment.cpp
+CMakeFiles/environment.dir/src/environment.cpp.o: ../src/kdtree.h
 CMakeFiles/environment.dir/src/environment.cpp.o: ../src/processPointClouds.cpp
 CMakeFiles/environment.dir/src/environment.cpp.o: ../src/processPointClouds.h
 CMakeFiles/environment.dir/src/environment.cpp.o: ../src/ransac.h

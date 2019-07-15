@@ -81,7 +81,9 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 template<typename PointT>
 std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::SegmentPlane(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceThreshold)
 {
-    // Time segmentation process
+    // This is the PCL implementation
+    // I created my own implementation in the ransac.h file
+    // I did this so that I could validate the results of my algorithm against the pcl implementation
     auto startTime = std::chrono::steady_clock::now();
 
     pcl::PointIndices::Ptr                inliersIndex (new pcl::PointIndices ());

@@ -4,6 +4,7 @@
 CMakeFiles/environment.dir/src/environment.cpp.o
  /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/cluster.h
  /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/environment.cpp
+ /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/kdtree.h
  /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/processPointClouds.cpp
  /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/processPointClouds.h
  /home/oleg/Documents/SensorFusion/SFND_Lidar_Obstacle_Detection/src/ransac.h

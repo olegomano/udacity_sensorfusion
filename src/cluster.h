@@ -1,10 +1,12 @@
 #ifndef _CLUSTER_H_
 #define _CLUSTER_H_
 #include "render/box.h"
+#include "kdtree.h"
 
 #include <vector>
 #include <limits>
 #include <unordered_set>
+
 
 
 template<typename PointT>
@@ -28,18 +30,20 @@ template<typename PointT>
 struct ClusterContext{
     std::vector<int>         clusterMembers;
     std::unordered_set<int>& processed;
+    KDTree<PointT>&          kdTree;
     float                    proximity;
     typename pcl::PointCloud<PointT>::Ptr cloud;
     
-    ClusterContext(std::unordered_set<int>& p):
-        processed(p){
-    }
+    ClusterContext(std::unordered_set<int>& p,KDTree<PointT>& tree):
+        processed(p),
+        kdTree(tree){}
 };
 
 template<typename PointT>
 void clusterPoint(ClusterContext<PointT>& context,int pointIndex){
     context.processed.insert(pointIndex);
-    std::vector<int> near = nearPoints<PointT>(context.cloud,pointIndex,context.proximity);
+    //std::vector<int>   near = nearPoints<PointT>(context.cloud,pointIndex,context.proximity);
+    std::vector<int>   near   = context.kdTree.nearIndexes(context.cloud->at(pointIndex),sqrt(context.proximity));
     
     for(int p = 0; p < near.size(); p++){
         if(context.processed.find(near[p]) == context.processed.end()){
@@ -54,13 +58,16 @@ void clusterPoint(ClusterContext<PointT>& context,int pointIndex){
 
 template<typename PointT>
 std::vector<Box> cluster(typename pcl::PointCloud<PointT>::Ptr cloud,float proximity){
+    auto startTime = std::chrono::steady_clock::now();
+    
+    KDTree<PointT>                kdTree(cloud);
     std::vector<Box>              clusters;
     std::unordered_set<int>       processed;
     
     for(int i = 0; i < cloud->size(); i++){
     //    std::cout << "clustering " << cloud->at(i) << std::endl;
 
-        ClusterContext<PointT> context(processed);
+        ClusterContext<PointT> context(processed,kdTree);
         context.cloud      = cloud;
         context.proximity  = proximity;
 
@@ -84,11 +91,15 @@ std::vector<Box> cluster(typename pcl::PointCloud<PointT>::Ptr cloud,float proxi
                 if(point.y < clusterBounds.y_min){ clusterBounds.y_min = point.y; }
                 if(point.z < clusterBounds.z_min){ clusterBounds.z_min = point.z; }              
             }
-            if(context.clusterMembers.size() > 15){
+            if(context.clusterMembers.size() > 25){
                 clusters.push_back(clusterBounds);
             }
         }
     }
+
+    auto endTime = std::chrono::steady_clock::now();
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+    std::cout << "clustering took " << elapsedTime.count() << " milliseconds and found " << clusters.size() << " clusters" << std::endl;
     return clusters;
 }
 
